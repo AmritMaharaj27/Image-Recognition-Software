@@ -37,12 +37,6 @@ for i in range(25):
   plt.grid(False)
   plt.imshow(X_test[i], cmap='binary')
 plt.show()
- 
- 
-
-
-
-
 
 #IMPORT FUNCTIONS + PRINT VERSION
 import tensorflow as tf
