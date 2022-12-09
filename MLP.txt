@@ -1,0 +1,167 @@
+# AMRIT MAHARAJ
+# 04/12/22
+
+#IMPORT FUNCTIONS + PRINT VERSION
+import tensorflow as tf
+import numpy as np
+import pandas as pd
+from tensorflow import keras
+from keras.datasets import cifar10
+from matplotlib import pyplot as plt
+ 
+#LOAD DATASET
+(X_train, y_train), (X_test, y_test) = cifar10.load_data()
+ 
+#INSPECT THIRD IMAGE IN X_TRAIN
+plt.figure()
+plt.imshow(X_train[2])
+plt.colorbar()
+plt.grid(False)
+plt.show()
+ 
+#CREATE LIST OF NAMES
+class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
+'dog', 'frog', 'horse', 'ship', 'truck']
+ 
+#X/Y_VALID STORES FIRST 5000 IMAGES FROM ORIGINAL, X/Y_TEST STORES REMAINDER
+X_valid, X_train = X_train[:5000] / 255.0, X_train[5000:] / 255.0
+y_valid, y_train = y_train[:5000], y_train[5000:]
+X_test = X_test / 255.0
+ 
+#DISPLAY FRIST 25 FROM X_TEST
+plt.figure(figsize=(10,10))
+for i in range(25):
+  plt.subplot(5,5,i+1)
+  plt.xticks([])
+  plt.yticks([])
+  plt.grid(False)
+  plt.imshow(X_test[i], cmap='binary')
+plt.show()
+ 
+ 
+
+
+
+
+
+#IMPORT FUNCTIONS + PRINT VERSION
+import tensorflow as tf
+from tensorflow import keras
+print(tf.__version__)
+print(keras.__version__)
+ 
+#LOAD FASHION MNIST DATASET (70,000 GREYSCALE IMAGES OF CLOTHING)
+fashion_mnist = keras.datasets.fashion_mnist
+(X_train, y_train), (X_test, y_test) = fashion_mnist.load_data()
+ 
+#CHECK SHAPE AND DATA TYPE OF DATA
+print(X_train.shape)
+print(X_train.dtype)
+print(y_test.shape)
+print(y_test.dtype)
+      
+#INSPECT FIRST IMAGE IN X_TRAIN
+plt.figure()
+plt.imshow(X_train[0])
+plt.colorbar()
+plt.grid(False)
+plt.show()
+ 
+#X_VALID STORES FIRST 5000 INSTANCES OF X_TRAIN
+#X_TRAIN STORES ITS REMAINING 55,000 INSTANCES
+X_valid, X_train = X_train[:5000] / 255.0, X_train[5000:] / 255.0
+y_valid, y_train = y_train[:5000], y_train[5000:]
+X_test = X_test / 255.0
+ 
+#PLOT FIRST IMAGE IN TRAINING SET. SINCE IN GREYSCALE, ASSIGN "BINARY" TO CMAP
+plt.imshow(X_train[0], cmap="binary")
+plt.axis('off')
+plt.show()
+ 
+#CREATE LIST OF NAMES
+class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
+'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
+ 
+# CHECK WHICH CLASS THE FIRST IMAGE BELINGS TO
+class_names[y_train[0]]
+ 
+#VERIFY IT WORKS BY DISPLAYING FIRST 25 IMAGES
+plt.figure(figsize=(10,10))
+for i in range(25):
+  plt.subplot(5,5,i+1)
+  plt.xticks([])
+  plt.yticks([])
+  plt.grid(False)
+  plt.imshow(X_train[i], cmap='binary')
+  plt.xlabel(class_names[y_train[i]])
+plt.show()
+ 
+#DEFINE MLP THAT CONTAINS 2 HIDDEN LAYERS
+model = keras.Sequential([
+  keras.layers.Flatten(input_shape=[28, 28]),
+  keras.layers.Dense(256, activation="relu"),
+  keras.layers.Dense(64, activation="relu"),
+  keras.layers.Dense(10, activation="softmax")
+])
+ 
+#USE SUMMARY TO DISPLAY ALL THE LAYERS ANS THEIR PARAMETERS
+model.summary()
+ 
+#ACCESS MODELS LAYERS AS A LIST
+model.layers
+ 
+#EXTRACT FIRST HIDDEN LAYER AND STORE IN VARIABLE
+hidden_layer_1 = model.layers[1]
+ 
+#USE GET WEIGHTS TO RETRIEVE CONNECTION WEIGHTS ANS BIAS VECTOR
+W, b = hidden_layer_1.get_weights()
+print(W.round(2))
+print(W.shape)
+print(b.round(2))
+print(b.shape)
+ 
+#SPECIFY MORE PARAMETERS BEFORE TRAINING
+    # LOSS = COMPUTE QUANTITY THAT A MODEL SHOULD SEEK TO MINIMIZE
+    # OPTIMIZER = DETERMINES HOW NEURAL NETWORK WOULD BE UPDATED BASED ON LOSS
+    # METRICS = WAYS FOR US TO MONITOR TRAINING AND TESTING
+model.compile(loss="sparse_categorical_crossentropy",
+optimizer="sgd",
+metrics=["accuracy"])
+ 
+#CALL MODEL FIT TO TRAIN. FEED TRAINING DATA X_TRAIN AND Y_TRAIN AND FEED VALIDATION
+history = model.fit(X_train, y_train, epochs=20, validation_data=(X_valid, y_valid))
+ 
+#HISTORY CONTAINS DATA ABOUT EVERYTHING THAT HAPPENED DURING TRAINING
+history_dict = history.history
+history_dict.keys()
+ 
+#CREATE A PANDAS DATA FRAME
+pd.DataFrame(history_dict).plot(figsize=(10,6))
+plt.grid(True)
+plt.gca().set_ylim(0, 1)
+plt.title('Accuracy and loss for both training and validation', fontsize=16)
+plt.xlabel('Epochs', fontsize=16)
+plt.ylabel('Accuracy and loss percentage', rotation=90, fontsize=16)
+plt.show()
+ 
+#CHECK TEST ACCURACY
+est_loss, test_acc = model.evaluate(X_test, y_test)
+print('Test accuracy:', test_acc)
+ 
+#NOW HAVE TRAINED MODEL
+ 
+#CAN NOW PREDICT IMAGES
+X_new = X_test[:5]
+y_proba = model.predict(X_new)
+y_proba.round(2)
+ 
+#USE NP.ARGMAX TO RETURN PREDICTED VALUES
+y_pred = np.argmax(model.predict(X_new), axis=-1)
+print(y_pred)
+ 
+#TRANSFORM INEGERS TO CLASS NAMES
+np.array(class_names)[y_pred]
+                      
+#CHECK TRUE LABEL VALUES OF 5 IMAGES TO SEE IF CONSISTANT WITH PREDICTED
+y_new = y_test[:5]
+y_new
